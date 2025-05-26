@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autopulse Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #1a3c54;
+            color: white;
+            position: fixed;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .logo {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #3498db;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .sidebar ul li {
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #2980b9;
+        }
+
+        .sidebar ul li.active > a {
+            background-color: #2980b9;
+        }
+
+        /* Dropdown styles */
+        .dropdown {
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background-color: #1a3c54;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: block;
+            font-size: 12px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #2980b9;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            overflow-y: auto;
+        }
+
+        .header {
+            background-color: white;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            color: #1a3c54;
+        }
+
+        .header .stats {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header .stats span {
+            background-color: #e8ecef;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* Cards */
+        .card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 16px;
+            color: #1a3c54;
+            margin-bottom: 10px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #1a3c54;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        .status-waiting {
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        .status-completed {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .see-more {
+            background-color: #1a3c54;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .see-more:hover {
+            background-color: #2980b9;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: 300px;
+            background-color: #e8ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-left: 20px;
+        }
+
+        .right-panel h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #1a3c54;
+        }
+
+        .right-panel .amount {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1a3c54;
+        }
+
+        .right-panel ul {
+            list-style: none;
+        }
+
+        .right-panel ul li {
+            margin-bottom: 5px;
+        }
+
+        .right-panel .withdraw {
+            color: #e74c3c;
+        }
+
+        .right-panel .completed {
+            color: #27ae60;
+        }
+
+        /* Account Drop */
+        .account-drop {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #1a3c54;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .account-drop img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .account-drop span {
+            font-size: 14px;
+        }
+
+        .account-drop .dropdown {
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        // JavaScript untuk menangani pop-up submenu
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdowns = document.querySelectorAll('.dropdown');
+
+            dropdowns.forEach(dropdown => {
+                dropdown.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const content = this.nextElementSibling;
+                    if (content.style.display === 'block') {
+                        content.style.display = 'none';
+                    } else {
+                        // Tutup semua dropdown lain
+                        document.querySelectorAll('.dropdown-content').forEach(item => {
+                            item.style.display = 'none';
+                        });
+                        content.style.display = 'block';
+                    }
+                });
+            });
+
+            // Menutup dropdown jika klik di luar
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) {
+                    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+                        dropdown.style.display = 'none';
+                    });
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">Autopulse</div>
+        <ul>
+            <li class="active"><a href="dashboard.html"><span>📊</span> Dashboard</a></li>
+            <li>
+                <a href="#" class="dropdown"><span>📊</span> Data Management</a>
+                <div class="dropdown-content">
+                    <a href="data-management.html">Workshop Information</a>
+                    <a href="#">Member</a>
+                    <a href="#">Captain</a>
+                    <a href="#">Available Brand</a>
+                    <a href="#">Service</a>
+                    <a href="#">Spare Part</a>
+                    <a href="#">Car List</a>
+                </div>
+            </li>
+            <li><a href="#"><span>🔧</span> Aktivitas Servis</a></li>
+            <li><a href="#"><span>📖</span> Logbook</a></li>
+            <li><a href="#"><span>💰</span> Finance</a></li>
+            <li><a href="#"><span>📣</span> Promo</a></li>
+            <li><a href="#"><span>🏷️</span> Brand Registration</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Dashboard</h1>
+            <div class="stats">
+                <span>12 Aktif</span>
+                <span>12</span>
+                <span>12</span>
+                <span>12</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Payment Confirmation</h2>
+            <p>List data yang belum melengkapi pembayaran</p>
+            <table>
+                <tr>
+                    <th>No</th>
+                    <th>Name</th>
+                    <th>Car</th>
+                    <th>Service Date</th>
+                    <th>Inspector</th>
+                    <th>Payment</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Mulyono</td>
+                    <td>Toyota Yaris</td>
+                    <td>12/05/2024</td>
+                    <td>Maryadi</td>
+                    <td class="status-waiting">Waiting for payment</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Taka</td>
+                    <td>Toyota Yaris</td>
+                    <td>12/05/2024</td>
+                    <td>Pontianak</td>
+                    <td class="status-waiting">Waiting for payment</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Vero</td>
+                    <td>Toyota Yaris</td>
+                    <td>12/05/2024</td>
+                    <td>Jember</td>
+                    <td class="status-waiting">Waiting for payment</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Jeki</td>
+                    <td>Toyota Yaris</td>
+                    <td>12/05/2024</td>
+                    <td>Bogor</td>
+                    <td class="status-completed">Completed</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Ana</td>
+                    <td>Toyota Yaris</td>
+                    <td>12/05/2024</td>
+                    <td>Bogor</td>
+                    <td class="status-completed">Completed</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Bayu</td>
+                    <td>Toyota Yaris</td>
+                    <td>12/05/2024</td>
+                    <td>Bogor</td>
+                    <td class="status-completed">Completed</td>
+                </tr>
+            </table>
+            <a href="#" class="see-more">See more</a>
+        </div>
+
+        <div style="display: flex; gap: 20px;">
+            <div class="card" style="flex: 1;">
+                <h2>Company Revenue</h2>
+                <p>Total $27 January 2024</p>
+                <ul>
+                    <li>Honda Service <span class="amount">Rp 125,000,000</span></li>
+                    <li>OtoSport <span class="amount">Rp 125,000,000</span></li>
+                    <li>Wuling Service <span class="amount">Rp 125,000,000</span></li>
+                </ul>
+                <a href="#" class="see-more">See more</a>
+            </div>
+            <div class="card" style="flex: 1;">
+                <h2>Withdrawal Confirmation</h2>
+                <ul>
+                    <li>Auto 2000 Silwangi <span class="withdraw">Waiting for payment</span> <span>Rp 125,000,000</span></li>
+                    <li>Auto 2000 Silwangi <span class="withdraw">Waiting for payment</span> <span>Rp 125,000,000</span></li>
+                    <li>Auto 2000 Silwangi <span class="withdraw">Waiting for payment</span> <span>Rp 125,000,000</span></li>
+                </ul>
+                <a href="#" class="see-more">See more</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Drop -->
+    <div class="account-drop">
+        <img src="https://via.placeholder.com/30" alt="User Profile">
+        <span>Autopulse <br> Super Admin <span class="dropdown">▼</span></span>
+    </div>
+</body>
+</html>
