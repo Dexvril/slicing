@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aktivitas Servis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #1a3c54;
+            color: white;
+            position: fixed;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .logo {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #3498db;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .sidebar ul li {
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #2980b9;
+        }
+
+        .sidebar ul li.active > a {
+            background-color: #2980b9;
+        }
+
+        /* Dropdown styles */
+        .dropdown {
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background-color: #1a3c54;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: block;
+            font-size: 12px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #2980b9;
+        }
+
+        .dropdown-content a.active {
+            background-color: #2980b9;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            overflow-y: auto;
+        }
+
+        .header {
+            background-color: white;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            color: #1a3c54;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .filters-left {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filters-left select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #1a3c54;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .action-buttons img {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .pagination select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .pagination .pages {
+            display: flex;
+            gap: 5px;
+        }
+
+        .pagination .pages span {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .pagination .pages span.active {
+            background-color: #1a3c54;
+            color: white;
+        }
+
+        /* Account Drop */
+        .account-drop {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #1a3c54;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .account-drop img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .account-drop span {
+            font-size: 14px;
+        }
+
+        .account-drop .dropdown {
+            cursor: pointer;
+        }
+
+        /* Modal for Service Detail */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            width: 80%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            text-align: left;
+        }
+
+        .modal-content h2 {
+            font-size: 16px;
+            color: #1a3c54;
+            margin-bottom: 10px;
+        }
+
+        .modal-content .detail-item {
+            margin-bottom: 10px;
+        }
+
+        .modal-content .detail-item label {
+            font-weight: bold;
+            color: #1a3c54;
+            display: inline-block;
+            width: 150px;
+        }
+
+        .modal-content .detail-item span {
+            color: #333;
+        }
+
+        .modal-content .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .modal-content .transaction-table, .transaction-table th, .transaction-table td {
+            border: 1px solid #ddd;
+        }
+
+        .modal-content .transaction-table th, .transaction-table td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        .modal-content .transaction-table th {
+            background-color: #1a3c54;
+            color: white;
+        }
+
+        .modal-content .transaction-table td {
+            background-color: #f9f9f9;
+        }
+
+        .modal-content .download-btn {
+            background-color: #1a3c54;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .modal-content .download-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .modal-content .close-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .modal-content .close-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+    <script>
+        // JavaScript untuk menangani pop-up submenu, modal, dan filter tabel
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdowns = document.querySelectorAll('.dropdown');
+            const modal = document.querySelector('.modal');
+            const closeModalBtn = document.querySelector('.modal .close-btn');
+            const table = document.querySelector('table tbody');
+            const totalElement = document.querySelector('.filters-left p');
+
+            // Data statis aktivitas servis
+            const serviceData = [
+                { no: 1, chassis: "123456789", license: "BA 1234 OOD", carName: "Toyota Yaris", captain: "Maryadi", date: "21/04/2025", status: "Completed" },
+                { no: 2, chassis: "123456789", license: "BA 1234 OOD", carName: "Toyota Yaris", captain: "Agus", date: "21/03/2025", status: "Completed" },
+                { no: 3, chassis: "123456789", license: "BA 1234 OOD", carName: "Toyota Yaris", captain: "Joko", date: "21/02/2025", status: "Completed" },
+                { no: 4, chassis: "123456790", license: "BA 5678 OOD", carName: "Honda Civic", captain: "Maryadi", date: "17/05/2025", status: "Completed" },
+                { no: 5, chassis: "123456791", license: "BA 9012 OOD", carName: "Wuling Almaz", captain: "Agus", date: "17/05/2025", status: "Completed" },
+                { no: 6, chassis: "123456789", license: "BA 1234 OOD", carName: "Toyota Yaris", captain: "Maryadi", date: "27/05/2025", status: "On Going" },
+                { no: 7, chassis: "123456790", license: "BA 5678 OOD", carName: "Honda Civic", captain: "Agus", date: "27/05/2025", status: "On Going" },
+                { no: 8, chassis: "123456792", license: "BA 1234 OOD", carName: "Toyota Yaris", captain: "Joko", date: "27/05/2025", status: "On Going" }
+            ];
+
+            // Fungsi untuk render tabel berdasarkan data
+            function renderTable(data) {
+                table.innerHTML = '';
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.no}</td>
+                        <td>${item.chassis}</td>
+                        <td>${item.license}</td>
+                        <td>${item.carName}</td>
+                        <td>${item.captain}</td>
+                        <td>${item.date}</td>
+                        <td>${item.status}</td>
+                        <td class="action-buttons">
+                            <a href="#" data-chassis="${item.chassis}" data-date="${item.date}"><img src="https://via.placeholder.com/20" alt="See Details"></a>
+                        </td>
+                    `;
+                    table.appendChild(row);
+                });
+                totalElement.textContent = `Total: ${data.length} Service Activities`;
+            }
+
+            // Ambil parameter dari URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const chassis = urlParams.get('chassis');
+            const statusFilter = urlParams.get('status');
+            const date = urlParams.get('date');
+
+            // Filter data berdasarkan parameter URL
+            let filteredData = serviceData;
+            if (chassis) {
+                filteredData = filteredData.filter(item => item.chassis === chassis);
+            }
+            if (statusFilter === 'ongoing') {
+                filteredData = filteredData.filter(item => item.status === 'On Going');
+            }
+
+            // Render tabel dengan data yang sudah difilter
+            renderTable(filteredData);
+
+            // Tampilkan modal jika ada parameter chassis dan date
+            if (chassis && date) {
+                modal.style.display = 'block';
+            }
+
+            // Dropdown submenu
+            dropdowns.forEach(dropdown => {
+                dropdown.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const content = this.nextElementSibling;
+                    if (content.style.display === 'block') {
+                        content.style.display = 'none';
+                    } else {
+                        document.querySelectorAll('.dropdown-content').forEach(item => {
+                            item.style.display = 'none';
+                        });
+                        content.style.display = 'block';
+                    }
+                });
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) {
+                    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+                        dropdown.style.display = 'none';
+                    });
+                }
+            });
+
+            // Tutup modal
+            closeModalBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+                // Reset URL tanpa parameter
+                window.history.pushState({}, document.title, window.location.pathname);
+            });
+
+            // Fungsi untuk membuka modal saat tombol "See Details" diklik
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.action-buttons img')) {
+                    e.preventDefault();
+                    const chassis = e.target.parentElement.getAttribute('data-chassis');
+                    const date = e.target.parentElement.getAttribute('data-date');
+                    // Update URL dengan parameter
+                    window.history.pushState({}, '', `?chassis=${chassis}&date=${date}`);
+                    modal.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">Autopulse</div>
+        <ul>
+            <li><a href="dashboard.html"><span>📊</span> Dashboard</a></li>
+            <li>
+                <a href="#" class="dropdown"><span>📊</span> Data Management</a>
+                <div class="dropdown-content">
+                    <a href="data-management.html">Workshop Information</a>
+                    <a href="member.html">Member</a>
+                    <a href="captain.html">Captain</a>
+                    <a href="available-brand.html">Available Brand</a>
+                    <a href="service.html">Service</a>
+                    <a href="spare-part.html">Spare Part</a>
+                    <a href="car-information.html">Car Information</a>
+                </div>
+            </li>
+            <li class="active"><a href="aktivitas-servis.html"><span>🔧</span> Aktivitas Servis</a></li>
+            <li><a href="#"><span>📖</span> Logbook</a></li>
+            <li><a href="#"><span>💰</span> Finance</a></li>
+            <li><a href="#"><span>📣</span> Promo</a></li>
+            <li><a href="#"><span>🏷️</span> Brand Registration</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Aktivitas Servis</h1>
+        </div>
+
+        <div class="filters">
+            <div class="filters-left">
+                <select>
+                    <option>Branch</option>
+                    <option>Kota Bogor</option>
+                </select>
+                <p>Total: 8 Service Activities</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Chassis Number</th>
+                        <th>License Plate</th>
+                        <th>Car Name</th>
+                        <th>Captain</th>
+                        <th>Service Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Tabel akan diisi oleh JavaScript -->
+                </tbody>
+            </table>
+            <div class="pagination">
+                <div>Show <select><option>10</option><option>20</option><option>50</option></select> entries</div>
+                <div class="pages">
+                    <span><</span>
+                    <span class="active">1</span>
+                    <span>2</span>
+                    <span>3</span>
+                    <span>4</span>
+                    <span>></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Service Detail -->
+    <div class="modal">
+        <div class="modal-content">
+            <h2>Service Information</h2>
+            <div class="detail-item"><label>Service Date:</label><span>Tuesday, 27 May 2025 11:11</span></div>
+            <div class="detail-item"><label>Captain:</label><span>Maryadi</span></div>
+            <div class="detail-item"><label>Service Status:</label><span>On Going</span></div>
+            <h3>Member Information</h3>
+            <div class="detail-item"><label>Name:</label><span>Anne</span></div>
+            <div class="detail-item"><label>Phone:</label><span>1234567890</span></div>
+            <div class="detail-item"><label>Address:</label><span>Jl. Siwangi No. 76, Pakuan, Bogor Selatan, Kota Bogor, Jawa Barat</span></div>
+            <h3>Car Information</h3>
+            <div class="detail-item"><label>Brand:</label><span>Toyota</span></div>
+            <div class="detail-item"><label>Model:</label><span>Yaris</span></div>
+            <div class="detail-item"><label>License Plate:</label><span>BA 1234 OOD</span></div>
+            <div class="detail-item"><label>Chassis Number:</label><span>123456789</span></div>
+            <div class="detail-item"><label>Year:</label><span>2020</span></div>
+            <h2>Transaction Details</h2>
+            <table class="transaction-table">
+                <tr>
+                    <th>Tire Replacement - Bridgestone</th>
+                    <td>Rp 500,000</td>
+                </tr>
+                <tr>
+                    <th>Service Fee</th>
+                    <td>Rp 200,000</td>
+                </tr>
+                <tr>
+                    <th>Engine Oil Replacement - Castrol</th>
+                    <td>Rp 250,000</td>
+                </tr>
+                <tr>
+                    <th>Service Fee</th>
+                    <td>Rp 100,000</td>
+                </tr>
+                <tr>
+                    <th>Grand Total</th>
+                    <td>Rp 1,050,000</td>
+                </tr>
+            </table>
+            <div style="text-align: right; margin-top: 10px;">
+                <a href="#" class="download-btn">Download Invoice</a>
+            </div>
+            <button class="close-btn">Close</button>
+        </div>
+    </div>
+
+    <!-- Account Drop -->
+    <div class="account-drop">
+        <img src="https://via.placeholder.com/30" alt="User Profile">
+        <span>Autopulse <br> Super Admin <span class="dropdown">▼</span></span>
+    </div>
+</body>
+</html>

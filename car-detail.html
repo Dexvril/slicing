@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autopulse Dashboard</title>
+    <title>Car Details</title>
     <style>
         * {
             margin: 0;
@@ -93,6 +93,10 @@
             background-color: #2980b9;
         }
 
+        .dropdown-content a.active {
+            background-color: #2980b9;
+        }
+
         .dropdown:hover .dropdown-content {
             display: block;
         }
@@ -120,120 +124,153 @@
             color: #1a3c54;
         }
 
-        .header .stats {
-            display: flex;
-            gap: 10px;
-        }
-
-        .header .stats span {
-            background-color: #e8ecef;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        /* Cards */
         .card {
             background-color: white;
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
         }
 
-        .card h2 {
+        .car-image {
+            flex: 1;
+            text-align: center;
+        }
+
+        .car-image img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .car-info {
+            flex: 2;
+        }
+
+        .car-info h2 {
             font-size: 16px;
             color: #1a3c54;
             margin-bottom: 10px;
         }
 
-        /* Table */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+        .detail-item {
+            margin-bottom: 10px;
         }
 
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #1a3c54;
-            color: white;
-        }
-
-        td {
-            background-color: #f9f9f9;
-        }
-
-        .status-waiting {
-            color: #e67e22;
+        .detail-item label {
             font-weight: bold;
+            color: #1a3c54;
+            display: inline-block;
+            width: 150px;
         }
 
-        .status-completed {
-            color: #27ae60;
-            font-weight: bold;
+        .detail-item span {
+            color: #333;
         }
 
-        .see-more {
+        .change-owner-btn, .edit-btn {
             background-color: #1a3c54;
             color: white;
             padding: 5px 10px;
             border: none;
             border-radius: 4px;
-            cursor: pointer;
             text-decoration: none;
             display: inline-block;
             margin-top: 10px;
         }
 
-        .see-more:hover {
+        .change-owner-btn:hover, .edit-btn:hover {
             background-color: #2980b9;
         }
 
-        /* Right Panel */
-        .right-panel {
-            width: 300px;
-            background-color: #e8ecef;
-            padding: 15px;
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
             border-radius: 8px;
-            margin-left: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
 
-        .right-panel h2 {
-            font-size: 16px;
-            margin-bottom: 10px;
-            color: #1a3c54;
+        .modal-content {
+            text-align: center;
         }
 
-        .right-panel .amount {
-            font-size: 18px;
+        .modal-content label {
             font-weight: bold;
-            margin-bottom: 10px;
             color: #1a3c54;
-        }
-
-        .right-panel ul {
-            list-style: none;
-        }
-
-        .right-panel ul li {
+            display: block;
             margin-bottom: 5px;
         }
 
-        .right-panel .withdraw {
-            color: #e74c3c;
+        .modal-content input {
+            padding: 5px;
+            width: 200px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
         }
 
-        .right-panel .completed {
-            color: #27ae60;
+        .modal-content button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            margin: 0 5px;
+        }
+
+        .modal-content .save-btn {
+            background-color: #1a3c54;
+            color: white;
+        }
+
+        .modal-content .save-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .modal-content .cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .modal-content .cancel-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .history-table, .history-table th, .history-table td {
+            border: 1px solid #ddd;
+        }
+
+        .history-table th, .history-table td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        .history-table th {
+            background-color: #1a3c54;
+            color: white;
+        }
+
+        .history-table td {
+            background-color: #f9f9f9;
+        }
+
+        .history-table a {
+            color: #1a3c54;
+            text-decoration: none;
+        }
+
+        .history-table a:hover {
+            text-decoration: underline;
         }
 
         /* Account Drop */
@@ -265,9 +302,13 @@
         }
     </style>
     <script>
-        // JavaScript untuk menangani pop-up submenu
+        // JavaScript untuk menangani pop-up submenu dan modal
         document.addEventListener('DOMContentLoaded', function() {
             const dropdowns = document.querySelectorAll('.dropdown');
+            const changeOwnerBtn = document.querySelector('.change-owner-btn');
+            const modal = document.querySelector('.modal');
+            const closeModal = document.querySelector('.modal .cancel-btn');
+            const saveOwner = document.querySelector('.modal .save-btn');
 
             dropdowns.forEach(dropdown => {
                 dropdown.addEventListener('click', function(e) {
@@ -276,7 +317,6 @@
                     if (content.style.display === 'block') {
                         content.style.display = 'none';
                     } else {
-                        // Tutup semua dropdown lain
                         document.querySelectorAll('.dropdown-content').forEach(item => {
                             item.style.display = 'none';
                         });
@@ -285,7 +325,6 @@
                 });
             });
 
-            // Menutup dropdown jika klik di luar
             document.addEventListener('click', function(e) {
                 if (!e.target.closest('.dropdown')) {
                     document.querySelectorAll('.dropdown-content').forEach(dropdown => {
@@ -293,6 +332,24 @@
                     });
                 }
             });
+
+            changeOwnerBtn.addEventListener('click', function() {
+                modal.style.display = 'block';
+            });
+
+            closeModal.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            saveOwner.addEventListener('click', function() {
+                // Logika simpan bisa ditambahkan di sini (misalnya, update data)
+                modal.style.display = 'none';
+            });
+
+            // Ambil parameter chassis dari URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const chassis = urlParams.get('chassis');
+            // Logika untuk memuat data berdasarkan chassis bisa ditambahkan di sini
         });
     </script>
 </head>
@@ -301,8 +358,8 @@
     <div class="sidebar">
         <div class="logo">Autopulse</div>
         <ul>
-            <li class="active"><a href="dashboard.html"><span>📊</span> Dashboard</a></li>
-            <li>
+            <li><a href="dashboard.html"><span>📊</span> Dashboard</a></li>
+            <li class="active">
                 <a href="#" class="dropdown"><span>📊</span> Data Management</a>
                 <div class="dropdown-content">
                     <a href="data-management.html">Workshop Information</a>
@@ -311,10 +368,10 @@
                     <a href="available-brand.html">Available Brand</a>
                     <a href="service.html">Service</a>
                     <a href="spare-part.html">Spare Part</a>
-                    <a href="car-information.html">Car List</a>
+                    <a href="car-information.html" class="active">Car Information</a>
                 </div>
             </li>
-            <li><a href="aktivitas-service.html"><span>🔧</span> Aktivitas Servis</a></li>
+            <li><a href="aktivitas-servis.html"><span>🔧</span> Aktivitas Servis</a></li>
             <li><a href="#"><span>📖</span> Logbook</a></li>
             <li><a href="#"><span>💰</span> Finance</a></li>
             <li><a href="#"><span>📣</span> Promo</a></li>
@@ -325,98 +382,72 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="header">
-            <h1>Dashboard</h1>
-            <div class="stats">
-                <span>12 Aktif</span>
-                <span>12</span>
-                <span>12</span>
-                <span>12</span>
-            </div>
+            <h1>Car Details</h1>
         </div>
 
         <div class="card">
-            <h2>Payment Confirmation</h2>
-            <p>List data yang belum melengkapi pembayaran</p>
-            <table>
+            <div class="car-image">
+                <img src="https://via.placeholder.com/300x150" alt="Car Image">
+            </div>
+            <div class="car-info">
+                <h2>Toyota Yaris</h2>
+                <div class="detail-item"><label>Status:</label><span>Active</span></div>
+                <h3>Car Information</h3>
+                <div class="detail-item"><label>Owner Name:</label><span>Anne</span></div>
+                <div class="detail-item"><label>Car Brand:</label><span>Toyota</span></div>
+                <div class="detail-item"><label>Model:</label><span>Yaris</span></div>
+                <div class="detail-item"><label>Year:</label><span>2020</span></div>
+                <div class="detail-item"><label>License Plate:</label><span>BA 1234 OOD</span></div>
+                <div class="detail-item"><label>Chassis Number:</label><span>123456789</span></div>
+                <a href="#" class="change-owner-btn">Change Owner</a>
+                <a href="car-edit.html?chassis=123456789" class="edit-btn">Edit</a>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <h2>History Service</h2>
+            <table class="history-table">
                 <tr>
                     <th>No</th>
-                    <th>Name</th>
-                    <th>Car</th>
+                    <th>Captain</th>
+                    <th>Last Mileage</th>
                     <th>Service Date</th>
-                    <th>Inspector</th>
-                    <th>Payment</th>
+                    <th>Action</th>
                 </tr>
                 <tr>
                     <td>1</td>
-                    <td>Mulyono</td>
-                    <td>Toyota Yaris</td>
-                    <td>12/05/2024</td>
                     <td>Maryadi</td>
-                    <td class="status-waiting">Waiting for payment</td>
+                    <td>20,000 km</td>
+                    <td>21/04/2025</td>
+                    <td><a href="aktivitas-servis.html?chassis=123456789&date=21/04/2025">See Details</a></td>
                 </tr>
                 <tr>
                     <td>2</td>
-                    <td>Taka</td>
-                    <td>Toyota Yaris</td>
-                    <td>12/05/2024</td>
-                    <td>Pontianak</td>
-                    <td class="status-waiting">Waiting for payment</td>
+                    <td>Agus</td>
+                    <td>20,000 km</td>
+                    <td>21/03/2025</td>
+                    <td><a href="aktivitas-servis.html?chassis=123456789&date=21/03/2025">See Details</a></td>
                 </tr>
                 <tr>
                     <td>3</td>
-                    <td>Vero</td>
-                    <td>Toyota Yaris</td>
-                    <td>12/05/2024</td>
-                    <td>Jember</td>
-                    <td class="status-waiting">Waiting for payment</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>Jeki</td>
-                    <td>Toyota Yaris</td>
-                    <td>12/05/2024</td>
-                    <td>Bogor</td>
-                    <td class="status-completed">Completed</td>
-                </tr>
-                <tr>
-                    <td>5</td>
-                    <td>Ana</td>
-                    <td>Toyota Yaris</td>
-                    <td>12/05/2024</td>
-                    <td>Bogor</td>
-                    <td class="status-completed">Completed</td>
-                </tr>
-                <tr>
-                    <td>6</td>
-                    <td>Bayu</td>
-                    <td>Toyota Yaris</td>
-                    <td>12/05/2024</td>
-                    <td>Bogor</td>
-                    <td class="status-completed">Completed</td>
+                    <td>Joko</td>
+                    <td>20,000 km</td>
+                    <td>21/02/2025</td>
+                    <td><a href="aktivitas-servis.html?chassis=123456789&date=21/02/2025">See Details</a></td>
                 </tr>
             </table>
-            <a href="#" class="see-more">See more</a>
         </div>
 
-        <div style="display: flex; gap: 20px;">
-            <div class="card" style="flex: 1;">
-                <h2>Company Revenue</h2>
-                <p>Total $27 January 2024</p>
-                <ul>
-                    <li>Honda Service <span class="amount">Rp 125,000,000</span></li>
-                    <li>OtoSport <span class="amount">Rp 125,000,000</span></li>
-                    <li>Wuling Service <span class="amount">Rp 125,000,000</span></li>
-                </ul>
-                <a href="#" class="see-more">See more</a>
-            </div>
-            <div class="card" style="flex: 1;">
-                <h2>Withdrawal Confirmation</h2>
-                <ul>
-                    <li>Auto 2000 Silwangi <span class="withdraw">Waiting for payment</span> <span>Rp 125,000,000</span></li>
-                    <li>Auto 2000 Silwangi <span class="withdraw">Waiting for payment</span> <span>Rp 125,000,000</span></li>
-                    <li>Auto 2000 Silwangi <span class="withdraw">Waiting for payment</span> <span>Rp 125,000,000</span></li>
-                </ul>
-                <a href="#" class="see-more">See more</a>
+        <!-- Modal for Change Owner -->
+        <div class="modal">
+            <div class="modal-content">
+                <h3>Change Owner</h3>
+                <label>Owner Name:</label>
+                <input type="text" placeholder="Enter owner name">
+                <label>Note:</label>
+                <input type="text" placeholder="Enter note">
+                <button class="save-btn">Change Owner</button>
+                <button class="cancel-btn">Cancel</button>
             </div>
         </div>
     </div>
