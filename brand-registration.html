@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autopulse - Brand Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #1a3c54;
+            color: white;
+            position: fixed;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .logo {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #3498db;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .sidebar ul li {
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #2980b9;
+        }
+
+        .sidebar ul li a.active {
+            background-color: #2980b9;
+        }
+
+        /* Dropdown styles */
+        .dropdown {
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background-color: #1a3c54;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1000; /* Pastikan di atas elemen lain */
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: block;
+            font-size: 12px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #2980b9;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            color: #1a3c54;
+            margin-bottom: 20px;
+        }
+
+        .card p {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .card label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .card input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .card button {
+            background-color: #1a3c54;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .card button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Verify Page */
+        .verify-page, .success-page {
+            display: none;
+        }
+
+        .verify-page.active, .success-page.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .verify-page img {
+            width: 200px;
+            margin-bottom: 20px;
+        }
+
+        .verify-page input {
+            width: 200px;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .verify-page a {
+            color: #1a3c54;
+            text-decoration: underline;
+            margin-top: 10px;
+        }
+
+        /* Success Page */
+        .success-page img {
+            width: 200px;
+            margin-bottom: 20px;
+        }
+
+        /* Account Drop */
+        .account-drop {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #1a3c54;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .account-drop img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .account-drop span {
+            font-size: 14px;
+        }
+
+        .account-drop .dropdown-content {
+            background-color: white;
+            color: #1a3c54;
+            right: 0;
+            top: 50px;
+        }
+
+        .account-drop .dropdown-content a {
+            color: #1a3c54;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dropdown Sidebar
+            const dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(dropdown => {
+                dropdown.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const content = this.nextElementSibling;
+                    const isOpen = content.style.display === 'block';
+
+                    // Tutup semua dropdown lain
+                    document.querySelectorAll('.dropdown-content').forEach(item => {
+                        item.style.display = 'none';
+                    });
+
+                    // Toggle dropdown yang diklik
+                    content.style.display = isOpen ? 'none' : 'block';
+                });
+            });
+
+            // Tutup dropdown jika klik di luar
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.sidebar')) {
+                    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+                        dropdown.style.display = 'none';
+                    });
+                }
+            });
+
+            // Form Submission
+            const registrationForm = document.querySelector('.registration-form');
+            const verifyPage = document.querySelector('.verify-page');
+            const successPage = document.querySelector('.success-page');
+
+            registrationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const brandName = document.getElementById('brand-name').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match!');
+                    return;
+                }
+
+                // Simulasi pengiriman ke verifikasi
+                registrationForm.style.display = 'none';
+                verifyPage.classList.add('active');
+            });
+
+            // Verify Submission
+            const verifyForm = document.querySelector('.verify-form');
+            verifyForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const verificationCode = document.getElementById('verification-code').value;
+
+                // Demo: Kode verifikasi statis
+                if (verificationCode === '123456') {
+                    verifyPage.style.display = 'none';
+                    successPage.classList.add('active');
+
+                    // Simpan data brand ke localStorage
+                    const brandData = {
+                        brandName: document.getElementById('brand-name').value,
+                        email: document.getElementById('email').value,
+                        date: new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' })
+                    };
+                    let brands = JSON.parse(localStorage.getItem('brands')) || [];
+                    brands.push(brandData);
+                    localStorage.setItem('brands', JSON.stringify(brands));
+                } else {
+                    alert('Invalid verification code!');
+                }
+            });
+
+            // Back to Dashboard
+            const backToDashboardBtn = document.querySelector('.back-to-dashboard');
+            backToDashboardBtn.addEventListener('click', function() {
+                window.location.href = 'dashboard.html'; // Arahkan ke dashboard
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">Autopulse</div>
+        <ul>
+            <li><a href="dashboard.html"><span>📊</span> Dashboard</a></li>
+            <li>
+                <a href="#" class="dropdown"><span>📊</span> Data Management</a>
+                <div class="dropdown-content">
+                    <a href="data-management.html">Workshop Information</a>
+                    <a href="member.html">Member</a>
+                    <a href="captain.html">Captain</a>
+                    <a href="available-brand.html">Available Brand</a>
+                    <a href="service.html">Service</a>
+                    <a href="spare-part.html">Spare Part</a>
+                    <a href="car-information.html">Car List</a>
+                </div>
+            </li>
+            <li><a href="service-activity.html"><span>🔧</span> Aktivitas Servis</a></li>
+            <li><a href="logbook.html"><span>📖</span> Logbook</a></li>
+            <li><a href="finance.html"><span>💰</span> Finance</a></li>
+            <li><a href="promotion.html"><span>📣</span> Promotion</a></li>
+            <li><a href="brand-registration.html" class="active"><span>🏷️</span> Brand Registration</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Registration Form -->
+        <div class="card registration-form">
+            <h2>Brand Registration</h2>
+            <p>Fill out the form to register the brand's account.</p>
+            <form>
+                <label for="brand-name">Brand Name</label>
+                <input type="text" id="brand-name" required>
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" required>
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+
+        <!-- Verify Page -->
+        <div class="card verify-page">
+            <img src="https://via.placeholder.com/200?text=Verify+Email" alt="Verify Email">
+            <h2>Check your email</h2>
+            <p>Enter the verification code in your inbox</p>
+            <form class="verify-form">
+                <input type="text" id="verification-code" placeholder="Enter code" required>
+                <button type="submit">Verify</button>
+            </form>
+            <a href="#">Didn't receive the verification code? Resend the code</a>
+        </div>
+
+        <!-- Success Page -->
+        <div class="card success-page">
+            <img src="https://via.placeholder.com/200?text=Success" alt="Success">
+            <h2>Branch's Account Successfully Created</h2>
+            <p>Congratulations, your branch account successfully created. Send email and password to your branch.</p>
+            <button class="back-to-dashboard">Back to Dashboard</button>
+        </div>
+    </div>
+
+    <!-- Account Drop -->
+    <div class="account-drop">
+        <img src="https://via.placeholder.com/30" alt="User Profile">
+        <span>Autopulse <br> Super Admin <span class="dropdown">▼</span></span>
+        <div class="dropdown-content">
+            <a href="#">Profile</a>
+            <a href="#">Settings</a>
+            <a href="#">Log out</a>
+        </div>
+    </div>
+</body>
+</html>

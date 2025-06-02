@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autopulse - Service Activity</title>
+    <title>Autopulse - Logbook</title>
     <style>
         * {
             margin: 0;
@@ -61,7 +61,7 @@
             background-color: #2980b9;
         }
 
-        .sidebar ul li.active > a {
+        .sidebar ul li a.active {
             background-color: #2980b9;
         }
 
@@ -154,7 +154,7 @@
         }
 
         .filter-section button {
-            background-color: #1a3c54;
+            background-color: #f39c12;
             color: white;
             padding: 5px 10px;
             border: none;
@@ -163,7 +163,7 @@
         }
 
         .filter-section button:hover {
-            background-color: #2980b9;
+            background-color: #e67e22;
         }
 
         /* Table */
@@ -192,23 +192,8 @@
             background-color: #f9f9f9;
         }
 
-        .status-on-service {
+        .status-paid {
             color: #27ae60;
-            font-weight: bold;
-        }
-
-        .status-in-schedule {
-            color: #3498db;
-            font-weight: bold;
-        }
-
-        .status-in-queue {
-            color: #f39c12;
-            font-weight: bold;
-        }
-
-        .status-waiting-quotation {
-            color: #e74c3c;
             font-weight: bold;
         }
 
@@ -273,6 +258,21 @@
             margin-top: 10px;
         }
 
+        .right-section .card button {
+            background-color: #1a3c54;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .right-section .card button:hover {
+            background-color: #2980b9;
+        }
+
         /* Account Drop */
         .account-drop {
             position: fixed;
@@ -334,6 +334,61 @@
                     });
                 }
             });
+
+            // Interaktivitas untuk ikon mata
+            const actionIcons = document.querySelectorAll('.action-icon');
+            const serviceDetail = document.querySelector('.right-section .card:nth-child(1)');
+            const transactionDetail = document.querySelector('.right-section .card:nth-child(2)');
+            const serviceDateP = serviceDetail.querySelector('p:nth-child(1)');
+            const lastMileageP = serviceDetail.querySelector('p:nth-child(2)');
+            const captainP = serviceDetail.querySelector('p:nth-child(3)');
+            const branchP = serviceDetail.querySelector('p:nth-child(4)');
+            const serviceStatusP = serviceDetail.querySelector('p:nth-child(5)');
+            const nameP = serviceDetail.querySelector('p:nth-child(7)');
+            const memberIdP = serviceDetail.querySelector('p:nth-child(8)');
+            const pointP = serviceDetail.querySelector('p:nth-child(9)');
+            const phoneP = serviceDetail.querySelector('p:nth-child(10)');
+            const addressP = serviceDetail.querySelector('p:nth-child(11)');
+            const brandP = serviceDetail.querySelector('p:nth-child(13)');
+            const typeP = serviceDetail.querySelector('p:nth-child(14)');
+            const licensePlateP = serviceDetail.querySelector('p:nth-child(15)');
+            const vinP = serviceDetail.querySelector('p:nth-child(16)');
+            const yearP = serviceDetail.querySelector('p:nth-child(17)');
+            const paymentStatusP = transactionDetail.querySelector('p:nth-child(11)');
+
+            actionIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const name = row.cells[1].textContent;
+                    const dateOfService = row.cells[2].textContent;
+                    const car = row.cells[3].textContent;
+                    const licensePlate = row.cells[4].textContent;
+                    const branch = row.cells[5].textContent;
+                    const captain = row.cells[6].textContent;
+                    const paymentStatus = row.cells[7].textContent;
+
+                    // Update Service Detail
+                    serviceDateP.textContent = `Service Date: ${dateOfService} 10:00 - 11:00`; // Format tanggal disesuaikan
+                    lastMileageP.textContent = `Last Mileage: 30,123 km`; // Data statis untuk contoh
+                    captainP.textContent = `Captain: ${captain}`;
+                    branchP.textContent = `Branch: ${branch}`;
+                    serviceStatusP.textContent = `Service Status: Completed`; // Data statis untuk contoh
+                    nameP.textContent = `Name: ${name}`;
+                    memberIdP.textContent = `Member ID: 123456789`; // Data statis untuk contoh
+                    pointP.textContent = `Point: 2,600`; // Data statis untuk contoh
+                    phoneP.textContent = `Phone: 628123456789`; // Data statis untuk contoh
+                    addressP.textContent = `Address: Jl. Silwangi No.76, Pakuan, Kec. Bogor Selatan, Kota Bogor, Jawa Barat`; // Data statis untuk contoh
+                    brandP.textContent = `Brand: Toyota`; // Ambil dari kolom Car untuk brand sederhana
+                    typeP.textContent = `Type: ${car.split(' ')[1] || 'Rush'}`; // Ambil tipe dari nama mobil
+                    licensePlateP.textContent = `License Plate: ${licensePlate}`;
+                    vinP.textContent = `VIN: 123456789`; // Data statis untuk contoh
+                    yearP.textContent = `Year: 2014`; // Data statis untuk contoh
+
+                    // Update Transaction Detail
+                    paymentStatusP.textContent = `Payment Status: ${paymentStatus}`;
+                    // Data transaksi lainnya tetap statis untuk contoh
+                });
+            });
         });
     </script>
 </head>
@@ -356,7 +411,7 @@
                 </div>
             </li>
             <li><a href="aktivitas-service.html"><span>🔧</span> Aktivitas Servis</a></li>
-            <li><a href="logbook.html"><span>📖</span> Logbook</a></li>
+            <li><a href="logbook.html" class="active"><span>📖</span> Logbook</a></li>
             <li><a href="finance.html"><span>💰</span> Finance</a></li>
             <li><a href="promotion.html"><span>📣</span> Promo</a></li>
             <li><a href="brand-registration.html"><span>🏷️</span> Brand Registration</a></li>
@@ -368,7 +423,7 @@
         <!-- Left Section -->
         <div class="left-section">
             <div class="card">
-                <h2>Service Activity</h2>
+                <h2>Logbook</h2>
                 <div class="filter-section">
                     <select>
                         <option>Branch</option>
@@ -379,6 +434,7 @@
                         <option>Maryadi</option>
                     </select>
                     <input type="date" placeholder="Date of Service">
+                    <input type="text" placeholder="Search Name/License Plate">
                     <button>Reset</button>
                 </div>
                 <p>List of service progress and status in real-time</p>
@@ -391,7 +447,7 @@
                         <th>License Plate</th>
                         <th>Branch</th>
                         <th>Captain</th>
-                        <th>Status</th>
+                        <th>Payment Status</th>
                         <th>Action</th>
                     </tr>
                     <tr>
@@ -402,7 +458,7 @@
                         <td>BA 1234 OOD</td>
                         <td>Honda Depasgar</td>
                         <td>Maryadi</td>
-                        <td class="status-on-service">On-Service</td>
+                        <td class="status-paid">Paid</td>
                         <td><span class="action-icon">👁️</span></td>
                     </tr>
                     <tr>
@@ -413,7 +469,7 @@
                         <td>BA 1234 OOD</td>
                         <td>Honda Depasgar</td>
                         <td>Maryadi</td>
-                        <td class="status-in-schedule">In-Schedule</td>
+                        <td class="status-waiting-payment">Waiting for Payment</td>
                         <td><span class="action-icon">👁️</span></td>
                     </tr>
                     <tr>
@@ -424,7 +480,7 @@
                         <td>BA 1234 OOD</td>
                         <td>Honda Depasgar</td>
                         <td>Maryadi</td>
-                        <td class="status-in-queue">In-Queue</td>
+                        <td class="status-paid">Paid</td>
                         <td><span class="action-icon">👁️</span></td>
                     </tr>
                     <tr>
@@ -435,7 +491,7 @@
                         <td>BA 1234 OOD</td>
                         <td>Honda Depasgar</td>
                         <td>Maryadi</td>
-                        <td class="status-waiting-quotation">Waiting for Quotation</td>
+                        <td class="status-waiting-payment">Waiting for Payment</td>
                         <td><span class="action-icon">👁️</span></td>
                     </tr>
                     <tr>
@@ -446,7 +502,7 @@
                         <td>BA 1234 OOD</td>
                         <td>Honda Depasgar</td>
                         <td>Maryadi</td>
-                        <td class="status-waiting-payment">Waiting for Payment</td>
+                        <td class="status-paid">Paid</td>
                         <td><span class="action-icon">👁️</span></td>
                     </tr>
                 </table>
@@ -464,6 +520,7 @@
                         <a href="#" class="active">1</a>
                         <a href="#">2</a>
                         <a href="#">3</a>
+                        <a href="#">4</a>
                         <a href="#">...</a>
                         <a href="#">10</a>
                     </div>
@@ -475,33 +532,33 @@
         <div class="right-section">
             <div class="card">
                 <h2>Service Detail</h2>
-                <p><strong>Service Date:</strong> Saturday, 23 December 2014 13:00 - 14:00</p>
-                <p><strong>Last Mileage:</strong> 30,123 km</p>
-                <p><strong>Captain:</strong> Maryadi</p>
-                <p><strong>Branch:</strong> Honda Depasgar</p>
-                <p><strong>Service Status:</strong> <span class="status-on-service">Completed</span></p>
+                <p></p> <!-- Service Date -->
+                <p></p> <!-- Last Mileage -->
+                <p></p> <!-- Captain -->
+                <p></p> <!-- Branch -->
+                <p></p> <!-- Service Status -->
                 <h3>Member Information</h3>
-                <p><strong>Name:</strong> Anne</p>
-                <p><strong>Member ID:</strong> 123456789</p>
-                <p><strong>Point:</strong> 2,600</p>
-                <p><strong>Phone:</strong> 628123456789</p>
-                <p><strong>Address:</strong> Jl. Silwangi No.76, Pakuan, Kec. Bogor Selatan, Kota Bogor, Jawa Barat</p>
+                <p></p> <!-- Name -->
+                <p></p> <!-- Member ID -->
+                <p></p> <!-- Point -->
+                <p></p> <!-- Phone -->
+                <p></p> <!-- Address -->
                 <h3>Car Information</h3>
-                <p><strong>Brand:</strong> Toyota</p>
-                <p><strong>Type:</strong> Rush</p>
-                <p><strong>License Plate:</strong> BA 1234 OOD</p>
-                <p><strong>VIN:</strong> 123456789</p>
-                <p><strong>Year:</strong> 2014</p>
+                <p></p> <!-- Brand -->
+                <p></p> <!-- Type -->
+                <p></p> <!-- License Plate -->
+                <p></p> <!-- VIN -->
+                <p></p> <!-- Year -->
             </div>
             <div class="card">
-                <h2>Quotation</h2>
+                <h2>Transaction Detail</h2>
                 <div class="item">
                     <span>Tire Replacement - Bridgestone</span>
-                    <span>Rp 3,000,000 x 4</span>
+                    <span>Rp 500,000 x 4</span>
                 </div>
                 <div class="item">
                     <span>Discount 10%</span>
-                    <span>Rp -400,000</span>
+                    <span>Rp -200,000</span>
                 </div>
                 <div class="item">
                     <span>Engine Oil Replacement - Castrol</span>
@@ -517,16 +574,20 @@
                 </div>
                 <div class="item total">
                     <span>Subtotal</span>
-                    <span>Rp 112,346</span>
+                    <span>Rp 1,260,000</span>
                 </div>
                 <div class="item total">
                     <span>Tax Deduction</span>
-                    <span>Rp 11,000</span>
+                    <span>Rp 123,346</span>
                 </div>
                 <div class="item total">
                     <span>Grand Total</span>
-                    <span>Rp 123,346</span>
+                    <span>Rp 1,383,346</span>
                 </div>
+                <p></p> <!-- Payment Status -->
+                <textarea placeholder="Warranty Note" rows="2" style="width: 100%; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                <button>Download Invoice</button>
+                <button>See Image (Transfer Proof & Quotation)</button>
             </div>
         </div>
     </div>

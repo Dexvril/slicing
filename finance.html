@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autopulse - Finance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #1a3c54;
+            color: white;
+            position: fixed;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .logo {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #3498db;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .sidebar ul li {
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #2980b9;
+        }
+
+        .sidebar ul li a.active {
+            background-color: #2980b9;
+        }
+
+        /* Dropdown styles */
+        .dropdown {
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background-color: #1a3c54;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: block;
+            font-size: 12px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #2980b9;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            overflow-y: auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        .left-section {
+            flex: 2;
+        }
+
+        .right-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 16px;
+            color: #1a3c54;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 8px 15px;
+            background-color: #ddd;
+            color: #1a3c54;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .tab.active {
+            background-color: #1a3c54;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-section select,
+        .filter-section input {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .filter-section button {
+            background-color: #f39c12;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .filter-section button:hover {
+            background-color: #e67e22;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #1a3c54;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        .status-completed {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .action-icon {
+            cursor: pointer;
+            color: #1a3c54;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .pagination select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .pagination a {
+            padding: 5px 10px;
+            text-decoration: none;
+            color: #1a3c54;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 0 2px;
+        }
+
+        .pagination a.active {
+            background-color: #1a3c54;
+            color: white;
+        }
+
+        /* Right Section */
+        .right-section .card {
+            font-size: 12px;
+        }
+
+        .right-section .card h3 {
+            font-size: 14px;
+            color: #1a3c54;
+            margin-bottom: 10px;
+        }
+
+        .right-section .card .item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .right-section .card .total {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .right-section .card button {
+            background-color: #1a3c54;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .right-section .card button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Account Drop */
+        .account-drop {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #1a3c54;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .account-drop img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .account-drop span {
+            font-size: 14px;
+        }
+
+        .account-drop .dropdown-content {
+            background-color: white;
+            color: #1a3c54;
+            right: 0;
+            top: 50px;
+        }
+
+        .account-drop .dropdown-content a {
+            color: #1a3c54;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dropdown Sidebar
+            const dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(dropdown => {
+                dropdown.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const content = this.nextElementSibling;
+                    if (content.style.display === 'block') {
+                        content.style.display = 'none';
+                    } else {
+                        document.querySelectorAll('.dropdown-content').forEach(item => {
+                            item.style.display = 'none';
+                        });
+                        content.style.display = 'block';
+                    }
+                });
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) {
+                    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+                        dropdown.style.display = 'none';
+                    });
+                }
+            });
+
+            // Tab Switching
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Interaktivitas untuk ikon mata
+            const rightSection = document.querySelector('.right-section');
+            const withdrawalDetail = rightSection.querySelector('.card:nth-child(1)');
+            const paymentDetail = rightSection.querySelector('.card:nth-child(2)');
+
+            // Withdrawal Detail Elements
+            const withdrawalDateP = withdrawalDetail.querySelector('p:nth-child(2)');
+            const withdrawalBranchP = withdrawalDetail.querySelector('p:nth-child(3)');
+            const withdrawalAmountP = withdrawalDetail.querySelector('p:nth-child(4)');
+            const withdrawalStatusP = withdrawalDetail.querySelector('p:nth-child(5)');
+            const withdrawalBankInfoP = withdrawalDetail.querySelector('p:nth-child(7)');
+            const withdrawalNoteP = withdrawalDetail.querySelector('p:nth-child(8)');
+
+            // Payment Detail Elements
+            const paymentDateP = paymentDetail.querySelector('p:nth-child(2)');
+            const paymentCustomerP = paymentDetail.querySelector('p:nth-child(3)');
+            const paymentBranchP = paymentDetail.querySelector('p:nth-child(4)');
+            const paymentAmountP = paymentDetail.querySelector('p:nth-child(5)');
+            const paymentStatusP = paymentDetail.querySelector('p:nth-child(6)');
+            const paymentMethodP = paymentDetail.querySelector('p:nth-child(8)');
+            const paymentNoteP = paymentDetail.querySelector('p:nth-child(9)');
+
+            // Withdrawal Action Icons
+            const withdrawalIcons = document.querySelectorAll('#withdrawal-table .action-icon');
+            withdrawalIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const date = row.cells[1].textContent;
+                    const branch = row.cells[2].textContent;
+                    const amount = row.cells[3].textContent;
+                    const status = row.cells[4].textContent;
+
+                    withdrawalDateP.textContent = `Date: ${date}`;
+                    withdrawalBranchP.textContent = `Branch: ${branch}`;
+                    withdrawalAmountP.textContent = `Amount: ${amount}`;
+                    withdrawalStatusP.textContent = `Status: ${status}`;
+                    withdrawalBankInfoP.textContent = `Bank Information: BCA - 1234567890`; // Statis untuk contoh
+                    withdrawalNoteP.textContent = `Note: Withdrawal for operational expenses`; // Statis untuk contoh
+
+                    // Sembunyikan Payment Detail, tampilkan Withdrawal Detail
+                    withdrawalDetail.style.display = 'block';
+                    paymentDetail.style.display = 'none';
+                });
+            });
+
+            // Payment Action Icons
+            const paymentIcons = document.querySelectorAll('#payment-table .action-icon');
+            paymentIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const date = row.cells[1].textContent;
+                    const customer = row.cells[2].textContent;
+                    const branch = row.cells[3].textContent;
+                    const amount = row.cells[4].textContent;
+                    const status = row.cells[5].textContent;
+
+                    paymentDateP.textContent = `Date: ${date}`;
+                    paymentCustomerP.textContent = `Customer: ${customer}`;
+                    paymentBranchP.textContent = `Branch: ${branch}`;
+                    paymentAmountP.textContent = `Amount: ${amount}`;
+                    paymentStatusP.textContent = `Status: ${status}`;
+                    paymentMethodP.textContent = `Payment Method: Bank Transfer`; // Statis untuk contoh
+                    paymentNoteP.textContent = `Note: Payment for service on Toyota Yaris`; // Statis untuk contoh
+
+                    // Sembunyikan Withdrawal Detail, tampilkan Payment Detail
+                    withdrawalDetail.style.display = 'none';
+                    paymentDetail.style.display = 'block';
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">Autopulse</div>
+        <ul>
+            <li><a href="dashboard.html"><span>📊</span> Dashboard</a></li>
+            <li>
+                <a href="#" class="dropdown"><span>📊</span> Data Management</a>
+                <div class="dropdown-content">
+                    <a href="data-management.html">Workshop Information</a>
+                    <a href="member.html">Member</a>
+                    <a href="captain.html">Captain</a>
+                    <a href="available-brand.html">Available Brand</a>
+                    <a href="service.html">Service</a>
+                    <a href="spare-part.html">Spare Part</a>
+                    <a href="car-information.html">Car List</a>
+                </div>
+            </li>
+            <li><a href="aktivitas-service.html"><span>🔧</span> Aktivitas Servis</a></li>
+            <li><a href="logbook.html"><span>📖</span> Logbook</a></li>
+            <li><a href="finance.html" class="active"><span>💰</span> Finance</a></li>
+            <li><a href="promotion.html"><span>📣</span> Promo</a></li>
+            <li><a href="brand-registration.html"><span>🏷️</span> Brand Registration</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Left Section -->
+        <div class="left-section">
+            <div class="card">
+                <h2>Finance</h2>
+                <div class="tabs">
+                    <div class="tab active" data-tab="withdrawal">Withdrawal</div>
+                    <div class="tab" data-tab="payment">Payment</div>
+                </div>
+                <div class="filter-section">
+                    <select>
+                        <option>Branch</option>
+                        <option>Honda Depasgar</option>
+                    </select>
+                    <input type="date" placeholder="Date">
+                    <input type="text" placeholder="Search">
+                    <button>Reset</button>
+                </div>
+                <p>List of financial transactions</p>
+
+                <!-- Withdrawal Tab -->
+                <div id="withdrawal" class="tab-content active">
+                    <table id="withdrawal-table">
+                        <tr>
+                            <th>No</th>
+                            <th>Date</th>
+                            <th>Branch</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>01/06/2025</td>
+                            <td>Honda Depasgar</td>
+                            <td>Rp 5,000,000</td>
+                            <td class="status-completed">Completed</td>
+                            <td><span class="action-icon">👁️</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>02/06/2025</td>
+                            <td>Honda Depasgar</td>
+                            <td>Rp 3,000,000</td>
+                            <td class="status-pending">Pending</td>
+                            <td><span class="action-icon">👁️</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>02/06/2025</td>
+                            <td>Honda Depasgar</td>
+                            <td>Rp 2,000,000</td>
+                            <td class="status-completed">Completed</td>
+                            <td><span class="action-icon">👁️</span></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Payment Tab -->
+                <div id="payment" class="tab-content">
+                    <table id="payment-table">
+                        <tr>
+                            <th>No</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Branch</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>01/06/2025</td>
+                            <td>Anne</td>
+                            <td>Honda Depasgar</td>
+                            <td>Rp 1,500,000</td>
+                            <td class="status-completed">Completed</td>
+                            <td><span class="action-icon">👁️</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>02/06/2025</td>
+                            <td>Budi</td>
+                            <td>Honda Depasgar</td>
+                            <td>Rp 2,000,000</td>
+                            <td class="status-pending">Pending</td>
+                            <td><span class="action-icon">👁️</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>02/06/2025</td>
+                            <td>Charlie</td>
+                            <td>Honda Depasgar</td>
+                            <td>Rp 1,000,000</td>
+                            <td class="status-completed">Completed</td>
+                            <td><span class="action-icon">👁️</span></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <div>
+                        <span>Show</span>
+                        <select>
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
+                        </select>
+                        <span>entries</span>
+                    </div>
+                    <div>
+                        <a href="#" class="active">1</a>
+                        <a href="#">2</a>
+                        <a href="#">3</a>
+                        <a href="#">...</a>
+                        <a href="#">10</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="right-section">
+            <div class="card">
+                <h2>Withdrawal Detail</h2>
+                <p></p> <!-- Date -->
+                <p></p> <!-- Branch -->
+                <p></p> <!-- Amount -->
+                <p></p> <!-- Status -->
+                <h3>Bank Information</h3>
+                <p></p> <!-- Bank Information -->
+                <p></p> <!-- Note -->
+            </div>
+            <div class="card" style="display: none;">
+                <h2>Payment Detail</h2>
+                <p></p> <!-- Date -->
+                <p></p> <!-- Customer -->
+                <p></p> <!-- Branch -->
+                <p></p> <!-- Amount -->
+                <p></p> <!-- Status -->
+                <h3>Payment Information</h3>
+                <p></p> <!-- Payment Method -->
+                <p></p> <!-- Note -->
+                <button>Download Invoice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Drop -->
+    <div class="account-drop">
+        <img src="https://via.placeholder.com/30" alt="User Profile">
+        <span>Autopulse <br> Super Admin <span class="dropdown">▼</span></span>
+        <div class="dropdown-content">
+            <a href="#">Profile</a>
+            <a href="#">Settings</a>
+            <a href="#">Log out</a>
+        </div>
+    </div>
+</body>
+</html>
